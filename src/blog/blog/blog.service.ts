@@ -3,72 +3,71 @@ import { Blog } from './blog.model';
 import { CreateBlogDTO } from './dto/create.blog.dto';
 import * as uuid from 'uuid'
 import { takeLast } from 'rxjs';
+import { BlogRepository } from './blog.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SearchBlogDTO } from './dto/search.blog.dto';
 
 @Injectable()
 export class BlogService {
 
-//Store all the blogs
-
-private blogs: Blog[]=[];
-
+constructor(
+  @InjectRepository(BlogRepository)
+  private blogrepository:BlogRepository
+){}
 
 //Create a new blog
-createBlog(createBlogDTO: CreateBlogDTO){
+async createBlog(createBlogDTO: CreateBlogDTO){
 
-const newId=uuid.v1();
-
-const blog: Blog={
-  
-  id: newId,
-  title: createBlogDTO.title,
-  description: createBlogDTO.description,
-  tags: createBlogDTO.tags
-
+return this.blogrepository.createblog(createBlogDTO);
 
 }
 
-//
 
-this.blogs.push(blog);
-return this.blogs;
+
+
+async getBlog(searchBlogDTO:SearchBlogDTO){
+
+return this.blogrepository.getblog(searchBlogDTO);
 }
 
-getBlog(){
 
-return this.blogs
 
-}
-
-updateblog(id:string, title:string){
-  const blog=this.blogs.find((blog)=>{
-      return blog.id==id;
-  });
+async getBlogById(id:string)
+{
+  const blog=await this.blogrepository.findOne(id);
 
   if(!blog){
-      throw new NotFoundException('Blog not found');
+throw new NotFoundException('Blog Not Found')
   }
 
-  blog.title=title
   return blog;
 }
 
-deleteblog(id:string){
-  //delete the task with the id
 
-  const blog=this.blogs.find((blog)=>{
-      return blog.id==id;
-  });
 
-  if(!blog){
-      throw new NotFoundException('Blog not found');
-  }
+async updateblog(id:string, title:string){
 
-  this.blogs=this.blogs.filter(task=>task.id!=id);
+  const blog=await this.getBlogById(id);
+  
+  blog.title=title;
+
+  await blog.save();
+
+  return blog;
+
+}
+
+async deleteblog(id:string){
+
+ const result= await this.blogrepository.delete(id);
+
+ if(result.affected==0)
+{
+  throw new NotFoundException('No blog found')
+}
 
   
-  return this.blogs;
-
-
+return result;
 }
 
 

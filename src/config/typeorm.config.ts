@@ -11,5 +11,5 @@ export const TypeORMConfiguration: TypeOrmModuleOptions={
     database:'blogapp',
     entities:[__dirname+'/../**/*.entity.{ts,js}'],
     
-    synchronize:true,
+    synchronize:false,
 };
