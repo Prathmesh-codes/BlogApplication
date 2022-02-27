@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { NOTFOUND } from 'dns';
 import { AuthCredsDTO } from './dto/auth.cred.dto';
 import { UserRepository } from './user.repository';
 
@@ -23,7 +24,13 @@ return this.userRepository.signup(authCredsDTO);
    
     async signin(authCredsDTO:AuthCredsDTO){
    
-        return this.userRepository.signin(authCredsDTO);
+       const result= await this.userRepository.signin(authCredsDTO);
+
+       if(!result){
+           throw new NotFoundException('User not found');
+       }
+
+       return {username: authCredsDTO.username};
    }
 
 
