@@ -18,9 +18,19 @@ export class UserRepository extends Repository<USerEntity>{
 
  async signin(authCredsDTO:AuthCredsDTO){
 
+    const{username,password}=authCredsDTO;
 
+    //find the user by uname
+    const user=await this.findOne({username:username});
+
+    //check
+
+if(user && await (user.validatePassword(password))){
+  return true;
 }
 
+return false;
 
+}
 
 }
