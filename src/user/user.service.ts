@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NOTFOUND } from 'dns';
 import { AuthCredsDTO } from './dto/auth.cred.dto';
+import { JwtPayload } from './jwt.payload';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -12,6 +14,8 @@ constructor(
 
 @InjectRepository(UserRepository)
 private userRepository:UserRepository,
+
+private jwtService: JwtService,
 
 
 ){}
@@ -24,13 +28,22 @@ return this.userRepository.signup(authCredsDTO);
    
     async signin(authCredsDTO:AuthCredsDTO){
    
-       const result= await this.userRepository.signin(authCredsDTO);
+       const user= await this.userRepository.signin(authCredsDTO);
 
-       if(!result){
+       if(!user){
            throw new NotFoundException('User not found');
        }
 
-       return {username: authCredsDTO.username};
+
+
+       //create a JWT token
+       const payload: JwtPayload={ username: authCredsDTO.username,
+        id: user.id,
+
+       };
+
+       const token= await this.jwtService.sign(payload);
+       return {token:token};
    }
 
 

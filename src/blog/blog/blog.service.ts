@@ -6,6 +6,7 @@ import { takeLast } from 'rxjs';
 import { BlogRepository } from './blog.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchBlogDTO } from './dto/search.blog.dto';
+import { USerEntity } from 'src/user/user.entity';
 
 @Injectable()
 export class BlogService {
@@ -16,18 +17,18 @@ constructor(
 ){}
 
 //Create a new blog
-async createBlog(createBlogDTO: CreateBlogDTO){
+async createBlog(createBlogDTO: CreateBlogDTO, user:USerEntity){
 
-return this.blogrepository.createblog(createBlogDTO);
+return this.blogrepository.createblog(createBlogDTO,user);
 
 }
 
 
 
 
-async getBlog(searchBlogDTO:SearchBlogDTO){
+async getBlog(searchBlogDTO:SearchBlogDTO,user:USerEntity){
 
-return this.blogrepository.getblog(searchBlogDTO);
+return this.blogrepository.getblog(searchBlogDTO,user);
 }
 
 

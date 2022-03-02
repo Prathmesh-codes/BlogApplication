@@ -25,11 +25,19 @@ export class UserRepository extends Repository<USerEntity>{
 
     //check
 
-if(user && await (user.validatePassword(password))){
-  return true;
+   
+
+if(!user){
+  return null;
 }
 
-return false;
+const passwordValidation=user.validatePassword(password);
+
+if(!passwordValidation){
+  return null;
+}
+
+return user;
 
 }
 
